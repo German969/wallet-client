@@ -1,7 +1,9 @@
-import { useMemo } from "react";
-import { WalletProps } from "./wallet.types";
+import { useMemo, useState } from "react";
+import { Currency, WalletProps } from "./wallet.types";
 
-export default function Wallet ({ address, balance, favourite, firstTransactionDate, onToggleFavourite }: WalletProps) {
+export default function Wallet ({ address, balance, favourite, firstTransactionDate, rates, onToggleFavourite }: WalletProps) {
+  const [selectedCurrency, setSelectedCurrency] = useState<Currency>(Currency.USD);
+
   const editBalance = (addr: string) => {};
   const toggleFavourite = () => {
     onToggleFavourite(address);
@@ -17,8 +19,6 @@ export default function Wallet ({ address, balance, favourite, firstTransactionD
 
     return daysPassed > 365;
   }, [firstTransactionDate]);
-
-  const convertedValue = 12435;
 
   return (
     <div>
@@ -44,12 +44,12 @@ export default function Wallet ({ address, balance, favourite, firstTransactionD
       <div className="card p-3" style={{ width: '200px'}}>
         <div className="form-group">
           <label htmlFor="currency">Currency</label>
-          <select className="form-control" id="currency" style={{width: "100px"}}>
-            <option>USD</option>
-            <option>EUR</option>
+          <select value={selectedCurrency} className="form-control" id="currency" style={{width: "100px"}} onChange={(e) => setSelectedCurrency(e.target.value as Currency)}>
+            <option value={Currency.USD}>USD</option>
+            <option value={Currency.EUR}>EUR</option>
           </select>
         </div>
-        <h5 className="card-title mt-3">$ {convertedValue}</h5>
+        <h5 className="card-title mt-3">$ {balance * (rates[selectedCurrency] || 0)}</h5>
       </div>
     </div>
     </div>

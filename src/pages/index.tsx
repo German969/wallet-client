@@ -9,6 +9,7 @@ import ResponseMessage from '@/components/response-message';
 const Home = ({ apiUrl }: { apiUrl: string }) => {
   const [newAddress, setNewAddress] = useState('');
   const [walletList, setWalletList] = useState<IWallet[]>([]);
+  const [rates, setRates] = useState({ usd: null, eur: null });
   const [responseMessage, setResponseMessage] = useState<ReactElement | null>(null);
   const [loading, setLoading] = useState(true);
 
@@ -76,6 +77,16 @@ const Home = ({ apiUrl }: { apiUrl: string }) => {
     fetchWallets(() => setResponseMessage(null));
   }, [fetchWallets]);
 
+  useEffect(() => {
+    axios.get(apiUrl + '/rates')
+      .then(response => {
+        setRates(response.data);
+      })
+      .catch(error => {
+        console.log(error);
+      })
+  }, [apiUrl]);
+
   return (
     <div className="container">
       <h1 className="text-center mt-3">Ethereum Wallets</h1>
@@ -102,6 +113,7 @@ const Home = ({ apiUrl }: { apiUrl: string }) => {
               balance={wallet.amount}
               favourite={wallet.favourite}
               firstTransactionDate={wallet.firstTransactionDate}
+              rates={rates}
               onToggleFavourite={toggleFavourite}
             />);
         })}
