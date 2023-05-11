@@ -1,10 +1,11 @@
 import { useMemo, useState } from "react";
 import { Currency, WalletProps } from "./wallet.types";
 
-export default function Wallet ({ address, balance, favourite, firstTransactionDate, rates, onToggleFavourite }: WalletProps) {
+export default function Wallet ({ address, balance, favourite, firstTransactionDate, rates, onToggleFavourite, onSetNewBalance }: WalletProps) {
   const [selectedCurrency, setSelectedCurrency] = useState<Currency>(Currency.USD);
+  const [editBalance, setEditBalance] = useState(false);
+  const [newBalance, setNewBalance] = useState(balance);
 
-  const editBalance = (addr: string) => {};
   const toggleFavourite = () => {
     onToggleFavourite(address);
   };
@@ -19,6 +20,11 @@ export default function Wallet ({ address, balance, favourite, firstTransactionD
 
     return daysPassed > 365;
   }, [firstTransactionDate]);
+
+  const onSubmitNewBalance = () => {
+    onSetNewBalance(address, newBalance);
+    setEditBalance(false);
+  };
 
   return (
     <div>
@@ -36,8 +42,21 @@ export default function Wallet ({ address, balance, favourite, firstTransactionD
       <div className="card" style={{ width: '500px'}}>
         <div className="card-body">
           <small className="card-text text-muted">{address}</small>
-          <i className="bi bi-pencil-square" style={{ position: 'absolute' , right: '20px', cursor: 'pointer'}} onClick={() => editBalance(address)}></i>
-          <h5 className="card-title mt-4" style={{ position: 'absolute', bottom: '20px' }}>{balance} ETH</h5>
+          <i className="bi bi-pencil-square" style={{ position: 'absolute' , right: '20px', cursor: 'pointer'}} onClick={() => setEditBalance(true)}></i>
+          {editBalance ? (
+            <div className="d-flex justify-content-center" style={{ position: 'absolute', bottom: '20px' }}>
+              <input
+                placeholder="ETH"
+                value={newBalance}
+                onChange={(e) => setNewBalance(Number(e.target.value))}
+                className="form-control"
+                style={{width: "350px"}}
+              />
+            <button className="btn btn-primary align-self-end" onClick={onSubmitNewBalance}>Save</button>
+          </div>
+          ) : (
+            <h5 className="card-title mt-4" style={{ position: 'absolute', bottom: '20px' }}>{balance} ETH</h5>
+          )}
           <i className={`bi ${favourite ? 'bi-star-fill' : 'bi-star'}`} style={{ position: 'absolute' , right: '20px', bottom: '20px', cursor: 'pointer'}} onClick={toggleFavourite}></i>
         </div>
       </div>

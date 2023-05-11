@@ -73,6 +73,24 @@ const Home = ({ apiUrl }: { apiUrl: string }) => {
       });
   };
 
+  const onSetNewBalance = (addr: string, newBalance: number) => {
+    setLoading(true);
+    axios.patch(apiUrl + `/wallets/${addr}/balance`, { balance: newBalance })
+      .then(response => {
+        setLoading(false);
+        setResponseMessage(
+          <ResponseMessage type='success' message='Balance updated' />
+        );
+        fetchWallets();
+      })
+      .catch(error => {
+        console.log(error);
+        setResponseMessage(
+          <ResponseMessage type='danger' message='Error updating balance' />
+        );
+      });
+  };
+
   useEffect(() => {
     fetchWallets(() => setResponseMessage(null));
   }, [fetchWallets]);
@@ -114,6 +132,7 @@ const Home = ({ apiUrl }: { apiUrl: string }) => {
               favourite={wallet.favourite}
               firstTransactionDate={wallet.firstTransactionDate}
               rates={rates}
+              onSetNewBalance={onSetNewBalance}
               onToggleFavourite={toggleFavourite}
             />);
         })}

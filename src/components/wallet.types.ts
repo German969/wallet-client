@@ -14,4 +14,5 @@ export interface WalletProps {
   firstTransactionDate: string;
   rates: Rate;
   onToggleFavourite: (addr: string) => void;
+  onSetNewBalance: (addr: string, balance: number) => void;
 }
