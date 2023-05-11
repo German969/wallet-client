@@ -50,9 +50,10 @@ export default function Wallet ({ address, balance, favourite, firstTransactionD
                 value={newBalance}
                 onChange={(e) => setNewBalance(Number(e.target.value))}
                 className="form-control"
-                style={{width: "350px"}}
+                style={{width: "250px"}}
               />
             <button className="btn btn-primary align-self-end" onClick={onSubmitNewBalance}>Save</button>
+            <button className="btn btn-secondary align-self-end" onClick={() => setEditBalance(false)}>Cancel</button>
           </div>
           ) : (
             <h5 className="card-title mt-4" style={{ position: 'absolute', bottom: '20px' }}>{balance} ETH</h5>
