@@ -4,6 +4,7 @@ import { ReactElement, useCallback, useEffect, useState } from 'react';
 import Wallet from '@/components/wallet';
 import axios from 'axios';
 import { IWallet } from '@/types/wallet.model';
+import ResponseMessage from '@/components/response-message';
 
 const Home = ({ apiUrl }: { apiUrl: string }) => {
   const [newAddress, setNewAddress] = useState('');
@@ -14,9 +15,7 @@ const Home = ({ apiUrl }: { apiUrl: string }) => {
   useEffect(() => {
     if (loading) {
       setResponseMessage(
-        <div className="alert alert-secondary m-auto" role="alert" style={{ width: '530px' }}>
-          Loading...
-        </div>
+        <ResponseMessage type="secondary" message={'Loading...'} />
       );
     }
   }, [loading])
@@ -41,9 +40,7 @@ const Home = ({ apiUrl }: { apiUrl: string }) => {
       .then((response) => {
         setLoading(false);
         setResponseMessage(
-          <div className="alert alert-success m-auto" role="alert" style={{ width: '530px' }}>
-            Added wallet {response.data.address}
-          </div>
+          <ResponseMessage type="success" message={`Added wallet ${response.data.address}`} />
         );
         fetchWallets();
         setNewAddress('');
@@ -51,12 +48,28 @@ const Home = ({ apiUrl }: { apiUrl: string }) => {
       .catch(error => {
         setLoading(false);
         setResponseMessage(
-          <div className="alert alert-danger m-auto" role="alert" style={{ width: '530px' }}>
-            {error.response.data?.message || 'Invalid wallet'}
-          </div>
+          <ResponseMessage type="danger" message={error.response.data?.message || 'Invalid wallet'} />
         );
         console.log(error);
       })
+  };
+
+  const toggleFavourite = (addr: string) => {
+    setLoading(true);
+    axios.patch(apiUrl + `/wallets/${addr}/favourite`)
+      .then(() => {
+        setLoading(false);
+        setResponseMessage(
+          <ResponseMessage type="success" message={`Added favourite ${addr}`} />
+        );
+        fetchWallets();
+      })
+      .catch(error => {
+        console.log(error);
+        setResponseMessage(
+          <ResponseMessage type="danger" message={'Error adding favourite'} />
+        );
+      });
   };
 
   useEffect(() => {
@@ -82,7 +95,15 @@ const Home = ({ apiUrl }: { apiUrl: string }) => {
       {responseMessage}
       <div className="container d-flex flex-column align-items-center mt-4">
         {walletList.map((wallet) => {
-          return (<Wallet key={wallet.address} address={wallet.address} balance={wallet.amount} favourite={wallet.favourite} />);
+          return (
+            <Wallet
+              key={wallet.address}
+              address={wallet.address}
+              balance={wallet.amount}
+              favourite={wallet.favourite}
+              firstTransactionDate={wallet.firstTransactionDate}
+              onToggleFavourite={toggleFavourite}
+            />);
         })}
       </div>
     </div>
